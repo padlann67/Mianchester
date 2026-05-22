@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MiAnchester – MIanchester</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Playfair+Display:ital,wght@1,700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red: #DA020E;
+      --red-dark: #9B0009;
+      --red-bright: #FF1A25;
+      --gold: #FFB800;
+      --gold-light: #FFD966;
+      --black: #0A0A0A;
+      --charcoal: #1A1A1A;
+      --white: #F5F0EB;
+      --grey: #2E2E2E;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* CUSTOM CURSOR */
+    .cursor {
+      position: fixed;
+      width: 16px; height: 16px;
+      background: var(--red);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s, width 0.2s, height 0.2s, background 0.2s;
+      mix-blend-mode: screen;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 1.5px solid var(--red);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, width 0.3s, height 0.3s;
+    }
+    body:hover .cursor { opacity: 1; }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.35;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 4rem;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.95) 0%, transparent 100%);
+      backdrop-filter: blur(4px);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.08em;
+      color: var(--white);
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--red); }
+    .nav-cta {
+      background: var(--red);
+      color: var(--white) !important;
+      opacity: 1 !important;
+      padding: 0.55rem 1.4rem;
+      clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+      transition: background 0.2s !important;
+    }
+    .nav-cta:hover { background: var(--red-bright) !important; }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(218,2,14,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(155,0,9,0.12) 0%, transparent 60%),
+        var(--black);
+    }
+    /* diagonal stripe */
+    .hero-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -55deg,
+        transparent,
+        transparent 80px,
+        rgba(218,2,14,0.03) 80px,
+        rgba(218,2,14,0.03) 82px
+      );
+    }
+
+    /* big BG text */
+    .hero-bg-text {
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(160px, 22vw, 320px);
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(218,2,14,0.12);
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -0.02em;
+      animation: bgDrift 8s ease-in-out infinite alternate;
+    }
+    @keyframes bgDrift {
+      from { transform: translateY(-50%) translateX(0); }
+      to   { transform: translateY(-50%) translateX(-2%); }
+    }
+
+    .hero-content {
+      position: relative;
+      padding: 0 4rem;
+      max-width: 780px;
+      animation: heroIn 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    @keyframes heroIn {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--red);
+      padding: 0.3rem 0.9rem;
+      clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 1.4rem;
+      animation: heroIn 1s 0.1s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 10vw, 130px);
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      color: var(--white);
+      animation: heroIn 1s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .hero-title .red { color: var(--red); }
+    .hero-title .outlined {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--white);
+    }
+
+    .hero-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 1.6vw, 1.3rem);
+      color: var(--gold);
+      margin: 1.2rem 0 0.6rem;
+      animation: heroIn 1s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: rgba(245,240,235,0.6);
+      max-width: 480px;
+      margin-bottom: 2.2rem;
+      animation: heroIn 1s 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: heroIn 1s 0.5s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: var(--white);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.9rem 2.2rem;
+      border: none;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      cursor: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-primary:hover { background: var(--red-bright); transform: scale(1.02); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--white);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.85rem 2rem;
+      border: 1.5px solid rgba(245,240,235,0.3);
+      cursor: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--red); color: var(--red); transform: scale(1.02); }
+
+    /* HERO STATS */
+    .hero-stats {
+      position: absolute;
+      bottom: 3rem;
+      right: 4rem;
+      display: flex;
+      gap: 3rem;
+      animation: heroIn 1s 0.7s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      color: var(--red);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(245,240,235,0.45);
+      margin-top: 0.2rem;
+    }
+
+    /* RED LINE DIVIDER */
+    .divider {
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--red), var(--red-bright), var(--red), transparent);
+      position: relative;
+    }
+    .divider::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      filter: blur(6px);
+      opacity: 0.5;
+    }
+
+    /* MARQUEE */
+    .marquee-wrap {
+      background: var(--red);
+      overflow: hidden;
+      padding: 0.7rem 0;
+      position: relative;
+    }
+    .marquee-track {
+      display: flex;
+      gap: 0;
+      animation: marquee 18s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      padding: 0 2.5rem;
+      color: rgba(245,240,235,0.9);
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .marquee-item::after {
+      content: '✦';
+      color: var(--gold);
+      font-size: 0.6rem;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ABOUT / STORY SECTION */
+    .section {
+      padding: 7rem 4rem;
+      position: relative;
+    }
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-label::before {
+      content: '';
+      width: 28px; height: 2px;
+      background: var(--red);
+      display: block;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 6vw, 80px);
+      line-height: 0.95;
+      letter-spacing: 0.01em;
+      margin-bottom: 1.5rem;
+    }
+    .about-title .accent { color: var(--red); }
+    .about-body {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: rgba(245,240,235,0.65);
+      margin-bottom: 1.2rem;
+    }
+    .about-body strong { color: var(--white); }
+
+    .about-visual {
+      position: relative;
+    }
+    .bowl-art {
+      width: 100%;
+      aspect-ratio: 1;
+      background: var(--charcoal);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10rem;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(218,2,14,0.2);
+    }
+    .bowl-art::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 30% 30%, rgba(218,2,14,0.15), transparent 60%);
+    }
+    .bowl-glow {
+      position: absolute;
+      width: 200px; height: 200px;
+      background: var(--red);
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.2;
+      animation: float 4s ease-in-out infinite alternate;
+    }
+    @keyframes float {
+      from { transform: translate(-20px, -20px); }
+      to   { transform: translate(20px, 20px); }
+    }
+    .bowl-emoji { font-size: 7rem; position: relative; z-index: 1; filter: drop-shadow(0 8px 30px rgba(218,2,14,0.4)); animation: float 3s ease-in-out infinite alternate; }
+
+    .corner-tag {
+      position: absolute;
+      top: -1rem; right: -1rem;
+      background: var(--red);
+      padding: 0.6rem 1rem;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%);
+    }
+
+    /* MENU SECTION */
+    .menu-section {
+      background: var(--charcoal);
+      padding: 7rem 4rem;
+    }
+    .menu-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 6vw, 80px);
+      line-height: 0.95;
+    }
+    .section-title .accent { color: var(--red); }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5px;
+    }
+    .menu-card {
+      background: var(--black);
+      padding: 2.2rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, background 0.3s;
+      cursor: none;
+    }
+    .menu-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(218,2,14,0.08) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .menu-card:hover { transform: translateY(-4px); background: #111; }
+    .menu-card:hover::before { opacity: 1; }
+
+    .menu-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.2rem;
+    }
+    .menu-emoji { font-size: 3rem; }
+    .menu-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      background: var(--red);
+      clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+    }
+    .menu-badge.gold { background: var(--gold); color: var(--black); }
+    .menu-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.5rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .menu-desc {
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: rgba(245,240,235,0.5);
+      margin-bottom: 1.5rem;
+    }
+    .menu-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .menu-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: var(--gold);
+      letter-spacing: 0.03em;
+    }
+    .menu-level {
+      display: flex;
+      gap: 3px;
+    }
+    .level-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+    .level-dot.empty { background: rgba(218,2,14,0.2); }
+
+    /* FEATURED / BIG MENU CARD */
+    .menu-card.featured {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #1a0000 0%, var(--charcoal) 100%);
+      border: 1px solid rgba(218,2,14,0.3);
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    .menu-card.featured .menu-emoji { font-size: 5rem; }
+    .menu-card.featured .menu-name { font-size: 2.2rem; }
+    .featured-content { flex: 1; }
+
+    /* LOCATION SECTION */
+    .location-section {
+      padding: 7rem 4rem;
+    }
+    .location-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .location-map {
+      background: var(--charcoal);
+      border: 1px solid rgba(218,2,14,0.15);
+      border-radius: 4px;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .map-pin {
+      font-size: 3rem;
+      animation: bounce 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(218,2,14,0.8));
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .map-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 30px, rgba(218,2,14,0.04) 30px, rgba(218,2,14,0.04) 31px),
+        repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(218,2,14,0.04) 30px, rgba(218,2,14,0.04) 31px);
+    }
+    .map-glow {
+      position: absolute;
+      width: 150px; height: 150px;
+      background: var(--red);
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.12;
+    }
+
+    .info-block {
+      margin-bottom: 2.5rem;
+    }
+    .info-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.4rem;
+    }
+    .info-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--white);
+      line-height: 1.4;
+    }
+    .info-sub {
+      font-size: 0.9rem;
+      color: rgba(245,240,235,0.5);
+      margin-top: 0.2rem;
+    }
+    .open-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(0,200,80,0.1);
+      border: 1px solid rgba(0,200,80,0.3);
+      color: #00c850;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      border-radius: 2px;
+    }
+    .open-dot {
+      width: 6px; height: 6px;
+      background: #00c850;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+
+    /* REVIEWS */
+    .reviews-section {
+      background: var(--charcoal);
+      padding: 7rem 4rem;
+      overflow: hidden;
+    }
+    .reviews-track {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 3rem;
+      animation: marquee 22s linear infinite;
+    }
+    .review-card {
+      background: var(--black);
+      border: 1px solid rgba(218,2,14,0.1);
+      padding: 2rem;
+      min-width: 320px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .review-card::before {
+      content: '"';
+      position: absolute;
+      top: -0.5rem; left: 1.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      color: var(--red);
+      opacity: 0.4;
+      line-height: 1;
+    }
+    .review-stars {
+      color: var(--gold);
+      font-size: 0.85rem;
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.1em;
+    }
+    .review-text {
+      font-size: 0.9rem;
+      line-height: 1.65;
+      color: rgba(245,240,235,0.7);
+      margin-bottom: 1.2rem;
+    }
+    .review-author {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .review-date {
+      font-size: 0.75rem;
+      color: rgba(245,240,235,0.35);
+      margin-top: 0.1rem;
+    }
+
+    /* CTA */
+    .cta-section {
+      padding: 8rem 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-bg {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 80% at 50% 50%, rgba(218,2,14,0.12), transparent 70%);
+    }
+    .cta-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 110px);
+      line-height: 0.95;
+      position: relative;
+    }
+    .cta-title .outline {
+      color: transparent;
+      -webkit-text-stroke: 1.5px var(--red);
+    }
+    .cta-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--gold);
+      margin: 1rem 0 2.5rem;
+      position: relative;
+    }
+
+    /* FOOTER */
+    footer {
+      background: #050505;
+      border-top: 1px solid rgba(218,2,14,0.15);
+      padding: 3rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 2rem;
+    }
+    .footer-brand {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.06em;
+    }
+    .footer-brand span { color: var(--red); }
+    .footer-tagline {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 0.8rem;
+      color: rgba(245,240,235,0.35);
+      margin-top: 0.2rem;
+    }
+    .footer-center {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .footer-shield {
+      width: 48px; height: 52px;
+      background: var(--red);
+      clip-path: polygon(50% 0%, 100% 15%, 100% 70%, 50% 100%, 0% 70%, 0% 15%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .footer-copy {
+      font-size: 0.72rem;
+      color: rgba(245,240,235,0.25);
+      letter-spacing: 0.1em;
+    }
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      justify-content: flex-end;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(245,240,235,0.4);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--red); }
+
+    /* SCROLL REVEAL */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .section, .menu-section, .location-section, .reviews-section, .cta-section { padding: 4rem 1.5rem; }
+      .about-grid, .location-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .menu-card.featured { grid-column: span 1; flex-direction: column; }
+      .hero-content { padding: 0 1.5rem; }
+      .hero-stats { right: 1.5rem; bottom: 2rem; gap: 1.5rem; }
+      footer { grid-template-columns: 1fr; text-align: center; gap: 1.5rem; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo"><span>Mi</span>Anchester</div>
+    <ul class="nav-links">
+      <li><a href="#about">Cerita Kami</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#lokasi">Lokasi</a></li>
+      <li><a href="#pesan" class="nav-cta">Pesan Sekarang</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-bg-text">MI</div>
+
+    <div class="hero-content">
+      <div class="hero-badge">🔥 Legendaaaaii<br>Mi Ayam<br>Sejatiiiiii</div>
+      <h1 class="hero-title">
+        <span class="red">Mi</span><br>
+        <span class="outlined">An</span>ches<br>ter
+      </h1>
+      <p class="hero-sub">Citarasa yang Tidak Pernah Mengecewakan</p>
+      <p class="hero-desc">
+        Di setiap semangkuk mi ayam kami, ada dedikasi, ada semangat juang, dan ada rasa yang selalu bikin kamu balik lagi. Seperti para legenda Old Trafford — <strong>kami selalu hadir untuk menang.</strong>
+      </p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn-primary">🍜 Lihat Menu</a>
+        <a href="#pesan" class="btn-secondary">Pesan Sekarang →</a>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">12+</div>
+        <div class="stat-label">Tahun Berdiri</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">50K+</div>
+        <div class="stat-label">Pelanggan Setia</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">4.9★</div>
+        <div class="stat-label">Rating Rasa</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider"></div>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <div class="marquee-item">Mi Ayam Spesial</div>
+      <div class="marquee-item">Kuah Gurih Khas</div>
+      <div class="marquee-item">Ayam Berbumbu Rahasia</div>
+      <div class="marquee-item">Mi Elastis Premium</div>
+      <div class="marquee-item">Topping Melimpah</div>
+      <div class="marquee-item">Halal & Higienis</div>
+      <div class="marquee-item">Sejak 2012</div>
+      <div class="marquee-item">Mi Ayam Spesial</div>
+      <div class="marquee-item">Kuah Gurih Khas</div>
+      <div class="marquee-item">Ayam Berbumbu Rahasia</div>
+      <div class="marquee-item">Mi Elastis Premium</div>
+      <div class="marquee-item">Topping Melimpah</div>
+      <div class="marquee-item">Halal & Higienis</div>
+      <div class="marquee-item">Sejak 2012</div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="about-grid">
+      <div>
+        <div class="section-label reveal">Kisah Kami</div>
+        <h2 class="about-title reveal reveal-delay-1">
+          Dimasak dengan <span class="accent">Passion.</span><br>
+          Disajikan dengan <span class="accent">Hati.</span>
+        </h2>
+        <p class="about-body reveal reveal-delay-2">
+          MiAnchester lahir dari satu keyakinan sederhana: <strong>mi ayam yang baik harus bisa bikin orang tersenyum.</strong> Berdiri sejak 2012 di Kediri, kami memulai dari satu gerobak kecil dengan resep warisan keluarga yang telah dijaga selama tiga generasi.
+        </p>
+        <p class="about-body reveal reveal-delay-2">
+          Nama "MiAnchester" bukan sekadar nama — ini adalah semangat pantang menyerah, seperti tim merah dari Manchester yang selalu berjuang hingga peluit terakhir. <strong>Kami percaya, mi ayam terbaik adalah yang dibuat dengan sepenuh jiwa.</strong>
+        </p>
+        <a href="#menu" class="btn-primary reveal reveal-delay-3" style="margin-top:1rem; display:inline-flex;">Jelajahi Menu →</a>
+      </div>
+      <div class="about-visual reveal reveal-delay-2">
+        <div class="bowl-art">
+          <div class="bowl-glow"></div>
+          <div class="bowl-emoji">🍜</div>
+        </div>
+        <div class="corner-tag">Since 2012</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- MENU -->
+  <section class="menu-section" id="menu">
+    <div class="menu-header">
+      <div>
+        <div class="section-label reveal">Menu Andalan</div>
+        <h2 class="section-title reveal reveal-delay-1">Pilih<br><span class="accent">Favoritmu</span></h2>
+      </div>
+      <p style="color:rgba(245,240,235,0.45); font-size:0.9rem; max-width:260px;" class="reveal">
+        Semua mi dibuat segar setiap hari. Kuah dimasak pagi hari dengan rempah pilihan.
+      </p>
+    </div>
+
+    <div class="menu-grid reveal">
+      <!-- Featured -->
+      <div class="menu-card featured">
+        <div class="menu-emoji">🏆</div>
+        <div class="featured-content">
+          <div class="menu-card-top">
+            <div></div>
+            <div class="menu-badge gold">Best Seller</div>
+          </div>
+          <div class="menu-name">Mi Ayam MiAnchester Special</div>
+          <div class="menu-desc">Mi ayam premium dengan double topping ayam berbumbu spesial, pangsit goreng, bakso sapi, dan kuah kaldu kental yang kaya rempah. Pilihan para juara.</div>
+          <div class="menu-footer">
+            <div class="menu-price">Rp 17.000</div>
+            <div class="menu-level">
+              <div class="level-dot"></div>
+              <div class="level-dot"></div>
+              <div class="level-dot"></div>
+              <div class="level-dot empty"></div>
+              <div class="level-dot empty"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regular -->
+      <div class="menu-card">
+        <div class="menu-card-top">
+          <div class="menu-emoji">🍜</div>
+          <div class="menu-badge">Original</div>
+        </div>
+        <div class="menu-name">Mi Ayam Original</div>
+        <div class="menu-desc">Resep klasik kami yang sudah ada sejak 2012. Mi kenyal, ayam gurih, saus tiram spesial. Tidak pernah mengecewakan.</div>
+        <div class="menu-footer">
+          <div class="menu-price">Rp 10.000</div>
+          <div class="menu-level">
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot empty"></div>
+            <div class="level-dot empty"></div>
+            <div class="level-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-card-top">
+          <div class="menu-emoji">🌶️</div>
+          <div class="menu-badge">Pedas</div>
+        </div>
+        <div class="menu-name">Mi Ayam Geprek Merah</div>
+        <div class="menu-desc">Versi pedas yang menggugah selera — ayam geprek sambal merah di atas mi hangat. Untuk yang berani.</div>
+        <div class="menu-footer">
+          <div class="menu-price">Rp 13.000</div>
+          <div class="menu-level">
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-card-top">
+          <div class="menu-emoji">🥚</div>
+          <div class="menu-badge">Komplit</div>
+        </div>
+        <div class="menu-name">Mi Ayam Bakso Komplit</div>
+        <div class="menu-desc">Paket lengkap — mi ayam + bakso sapi + telur rebus + pangsit goreng. Kenyang maksimal, harga bersahabat.</div>
+        <div class="menu-footer">
+          <div class="menu-price">Rp 15.000</div>
+          <div class="menu-level">
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot empty"></div>
+            <div class="level-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card">
+        <div class="menu-card-top">
+          <div class="menu-emoji">🍲</div>
+        </div>
+        <div class="menu-name">Bakso Kuah Spesial</div>
+        <div class="menu-desc">Kuah kaldu sapi bening dengan bakso tetelan, bakso halus, dan bakso urat. Cocok untuk cuaca apapun.</div>
+        <div class="menu-footer">
+          <div class="menu-price">Rp 13.000</div>
+          <div class="menu-level">
+            <div class="level-dot"></div>
+            <div class="level-dot"></div>
+            <div class="level-dot empty"></div>
+            <div class="level-dot empty"></div>
+            <div class="level-dot empty"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider"></div>
+
+  <!-- LOCATION -->
+  <section class="location-section" id="lokasi">
+    <div class="section-label reveal">Temukan Kami</div>
+    <div class="location-grid" style="margin-top:2rem;">
+      <div>
+        <div class="location-map reveal">
+          <div class="map-bg"></div>
+          <div class="map-glow"></div>
+          <div class="map-pin">📍</div>
+        </div>
+      </div>
+      <div>
+        <h2 class="section-title reveal" style="margin-bottom:2.5rem;">
+          Mampir &<br><span class="accent">Kunjungi</span><br>Kami
+        </h2>
+
+        <div class="info-block reveal reveal-delay-1">
+          <div class="info-label">Alamat</div>
+          <div class="info-value">Jl. Raya Pahlawan No. 88<br>Kediri, Jawa Timur</div>
+          <div class="info-sub">Di sebelah alun-alun, mudah dijangkau</div>
+        </div>
+
+        <div class="info-block reveal reveal-delay-2">
+          <div class="info-label">Jam Buka</div>
+          <div class="info-value">07.00 – 21.00 WIB</div>
+          <div class="info-sub">Setiap hari termasuk hari libur</div>
+          <div style="margin-top:0.6rem;"><span class="open-badge"><span class="open-dot"></span>Buka Sekarang</span></div>
+        </div>
+
+        <div class="info-block reveal reveal-delay-3">
+          <div class="info-label">Kontak</div>
+          <div class="info-value">0856-0280-6887</div>
+          <div class="info-sub">WhatsApp & Telepon tersedia</div>
+        </div>
+
+        <a href="https://wa.me/6285602806887" class="btn-primary" style="margin-top:1rem; text-decoration:none; display:inline-flex;">
+          💬 Pesan via WhatsApp
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="reviews-section">
+    <div class="section-label reveal">Kata Mereka</div>
+    <h2 class="section-title reveal reveal-delay-1" style="margin-top:0.5rem;">
+      Testimoni<br><span class="accent">Pelanggan</span>
+    </h2>
+    <div style="overflow:hidden;">
+      <div class="reviews-track">
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Kuahnya nendang banget! Udah 5 tahun langganan MiAnchester, sampai sekarang gak pernah bosen. Teman-teman kantor juga pada suka.</p>
+          <div class="review-author">Andi Pratama</div>
+          <div class="review-date">Pelanggan Setia · Kediri</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Mi Geprek Merahnya juara! Pedasnya pas, ayamnya empuk, dan porsinya bikin kenyang. Harganya juga sangat worth it banget.</p>
+          <div class="review-author">Sari Dewi</div>
+          <div class="review-date">Foodie · Kediri</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Bawa keluarga ke sini setiap minggu. Anak-anak sukanya Mi Original, saya selalu pesan yang Spesial. Tempatnya juga nyaman dan bersih.</p>
+          <div class="review-author">Budi Santoso</div>
+          <div class="review-date">Keluarga · Kediri</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Pelayanannya cepat dan ramah. Pesanan online juga selalu tepat waktu. Mi Bakso Komplitnya gak ada duanya di Kediri!</p>
+          <div class="review-author">Rini Kusuma</div>
+          <div class="review-date">Online Customer · Kediri</div>
+        </div>
+        <!-- duplicate for seamless loop -->
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Kuahnya nendang banget! Udah 5 tahun langganan MiAnchester, sampai sekarang gak pernah bosen. Teman-teman kantor juga pada suka.</p>
+          <div class="review-author">Andi Pratama</div>
+          <div class="review-date">Pelanggan Setia · Kediri</div>
+        </div>
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <p class="review-text">Mi Geprek Merahnya juara! Pedasnya pas, ayamnya empuk, dan porsinya bikin kenyang. Harganya juga sangat worth it banget.</p>
+          <div class="review-author">Sari Dewi</div>
+          <div class="review-date">Foodie · Kediri</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="pesan">
+    <div class="cta-bg"></div>
+    <h2 class="cta-title reveal">
+      Lapar?<br>
+      <span class="outline">Kami Siap</span><br>
+      Melayani
+    </h2>
+    <p class="cta-sub reveal reveal-delay-1">Pesan sekarang juga</p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;" class="reveal reveal-delay-2">
+      <a href="https://wa.me/6285602806887" class="btn-primary" style="font-size:1.05rem; padding:1rem 2.5rem;">
+        🍜 Pesan via WhatsApp
+      </a>
+      <a href="#lokasi" class="btn-secondary" style="font-size:1.05rem; padding:1rem 2.2rem;">
+        📍 Lihat Lokasi
+      </a>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider"></div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div>
+      <div class="footer-brand">Mi<span>An</span>chester</div>
+      <div class="footer-tagline">Mi Ayam yang Tidak Pernah Mengecewakan</div>
+    </div>
+    <div class="footer-center">
+      <div class="footer-shield">⚽</div>
+      <div class="footer-copy">© 2024 MiAnchester. All rights reserved.</div>
+    </div>
+    <ul class="footer-links">
+      <li><a href="#about">Tentang</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#lokasi">Lokasi</a></li>
+    </ul>
+  </footer>
+
+  <script>
+    // CURSOR
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.style.width = '24px';
+        cursor.style.height = '24px';
+        cursor.style.background = 'var(--gold)';
+        ring.style.width = '60px';
+        ring.style.height = '60px';
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.style.width = '16px';
+        cursor.style.height = '16px';
+        cursor.style.background = 'var(--red)';
+        ring.style.width = '40px';
+        ring.style.height = '40px';
+      });
+    });
+
+    // SCROLL REVEAL
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => observer.observe(r));
+
+    // COUNTER ANIMATION
+    function animateCounters() {
+      document.querySelectorAll('.stat-num').forEach(el => {
+        const text = el.textContent;
+        const match = text.match(/[\d.]+/);
+        if (!match) return;
+        const target = parseFloat(match[0]);
+        const suffix = text.replace(match[0], '');
+        let start = 0;
+        const step = target / 60;
+        const interval = setInterval(() => {
+          start = Math.min(start + step, target);
+          el.textContent = (Number.isInteger(target) ? Math.floor(start) : start.toFixed(1)) + suffix;
+          if (start >= target) clearInterval(interval);
+        }, 25);
+      });
+    }
+
+    const heroObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) animateCounters();
+    }, { threshold: 0.5 });
+    heroObserver.observe(document.querySelector('.hero'));
+  </script>
+</body>
+</html>
